@@ -1,2 +1,21 @@
+# ===== Eclipse =====
+.project
+.classpath
+.settings/
+
+# ===== Maven =====
 /target/
-/build/
+
+# ===== Compiled files =====
+*.class
+
+# ===== Logs =====
+*.log
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+
+# ===== Environment files =====
+.env
+
