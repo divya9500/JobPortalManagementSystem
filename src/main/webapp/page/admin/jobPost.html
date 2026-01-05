@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post New Job | Admin</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body{
+  background:#f8fafc;
+  color:#1f2937;
+}
+
+.container{
+  max-width:900px;
+  margin:40px auto;
+  background:#ffffff;
+  padding:40px;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+}
+
+h1{
+  font-size:26px;
+  margin-bottom:25px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+}
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.form-group.full{
+  grid-column:1 / -1;
+}
+
+label{
+  font-size:14px;
+  margin-bottom:6px;
+  font-weight:600;
+}
+
+input, textarea, select{
+  padding:12px 14px;
+  border-radius:8px;
+  border:1px solid #cbd5e1;
+  font-size:14px;
+}
+
+input:focus, textarea:focus, select:focus{
+  outline:none;
+  border-color:#2563eb;
+}
+
+textarea{
+  resize:vertical;
+  min-height:120px;
+}
+
+.actions{
+  margin-top:30px;
+  display:flex;
+  justify-content:flex-end;
+  gap:15px;
+}
+
+button{
+  padding:12px 24px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-cancel{
+  background:#f1f5f9;
+  color:#334155;
+}
+
+.btn-submit{
+  background:#2563eb;
+  color:#ffffff;
+}
+
+@media(max-width:768px){
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Post New Job</h1>
+
+  <form  id="jobPostForm">
+   <input type="hidden" id="jobId" name="jobId">
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Job Title</label>
+        <input id="title" name ="title" type="text" placeholder="Java Developer" required>
+      </div>
+
+      <div class="form-group">
+        <label>Location</label>
+        <input id="location" name="location" type="text" placeholder="Bangalore" required>
+      </div>
+
+      <div class="form-group">
+        <label>Employment Type</label>
+        <select id="empType" name="empType" required>
+  <option value="FULL_TIME">FULL_TIME</option>
+  <option value="PART_TIME">PART_TIME</option>
+  <option value="CONTRACT">CONTRACT</option>
+</select>
+
+      </div>
+
+      <div class="form-group">
+        <label>Minimum Experience (Years)</label>
+        <input id="min_experience" name="min_experience" type="number" min="0">
+      </div>
+
+      <div class="form-group">
+        <label>Maximum Experience (Years)</label>
+        <input id="max_experience" name="max_experience" type="number" min="0">
+      </div>
+
+      <div class="form-group">
+        <label>Minimum Salary</label>
+        <input id="min_salary" name="min_salary" type="number" step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label>Maximum Salary</label>
+        <input id="max_salary" name="max_salary" type="number" step="0.01">
+      </div>
+
+      <div class="form-group full">
+        <label>Job Description</label>
+        <textarea id="description" name="description" placeholder="Enter detailed job description"></textarea>
+      </div>
+
+    </div>
+     <div class="form-group">
+        <label>Job Status</label>
+        <select id="status" name="status" required>
+  <option value="OPEN">OPEN</option>
+  <option value="CLOSED">CLOSED</option>
+  <option value="ON_HOLD">ON_HOLD</option>
+</select>
+ </div>
+
+    <div class="actions">
+      <button type="button" class="btn-cancel">Cancel</button>
+      <button id="submitBtn" type="submit" class="btn-submit">Post Job</button>
+    </div>
+    
+    
+    <div id="message">
+    </div>
+  </form>
+</div>
+<script src="/JobPortalManagementSystem/js/adminJobPost.js"></script>
+<script src="../../js/showExistingJobData.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Applicants | Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../../css/viewApplicant.css">
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Applicants</h1>
+    <p class="job-info" id="jobInfo">Loading job details...</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Applied Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="appBody"></tbody>
+  </table>
+</div>
+
+<!-- ================= Bulk Filter ================= -->
+<div class="filter-card">
+
+  <h3>Candidate Shortlisting</h3>
+  <p>Apply filters and move candidates</p>
+
+  <div class="filter-grid">
+    <div class="field">
+      <label>Min Experience</label>
+      <input type="number" id="minExp">
+    </div>
+
+    <div class="field">
+      <label>Min Graduation Year</label>
+      <input type="number" id="gradYear">
+    </div>
+
+    <div class="field">
+      <label>Applied After</label>
+      <input type="date" id="appliedAfter">
+    </div>
+
+    <div class="field">
+      <label>Top N</label>
+      <input type="number" id="limit">
+    </div>
+
+    <div class="field">
+      <label>From Status</label>
+      <select id="fromStatus">
+        <option value="">Select</option>
+        <option>APPLIED</option>
+        <option>SHORTLISTED</option>
+        <option>INTERVIEW_SCHEDULED</option>
+        <option>INTERVIEW_PASSED</option>
+        <option>INTERVIEW_FAILED</option>
+        <option>OFFERED</option>
+        <option>REJECTED</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Move To</label>
+      <select id="toStatus">
+        <option value="">Select</option>
+        <option>APPLIED</option>
+        <option>SHORTLISTED</option>
+        <option>INTERVIEW_SCHEDULED</option>
+        <option>INTERVIEW_PASSED</option>
+        <option>INTERVIEW_FAILED</option>
+        <option>OFFERED</option>
+        <option>REJECTED</option>
+      </select>
+    </div>
+  </div>
+
+ <button class="btn-primary" onclick="bulkUpdateStatus(this)">
+  Shortlist Top Candidates
+</button>
+
+</div>
+
+<!-- ================= History Modal ================= -->
+<div id="historyModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeHistoryModal()">×</span>
+    <h3>Status History</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>Changed By</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="historyTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="../../js/viewApplicant.js"></script>
+</body>
+</html>

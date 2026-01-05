@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechNova Solutions | Careers Admin</title>
+  <link rel="stylesheet" href="../../css/adminDashBoard.css" />
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <h2>TechNova</h2>
+      <span>Careers Admin</span>
+    </div>
+
+    <nav>
+      <a class="active" href="#">Dashboard</a>
+      <a href="jobPost.html">Post Job</a>
+      <a href="manageJob.html">Manage Jobs</a>
+      <a href="showAllJobs.html">Applicants</a>
+      <a href="#" class="logout" id="logout">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Overview of recruitment activity</p>
+      </div>
+
+      <button onclick="window.location.href='/JobPortalManagementSystem/page/admin/jobPost.html'">
+        + Post New Job
+      </button>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat-card">
+        <h3>Total Jobs</h3>
+        <p id="totalJobs">12</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Total Applicants</h3>
+        <p id="TotalApplicants">85</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>Pending</h3>
+        <p id="PendingApplications">20</p>
+      </div>
+
+      <div class="stat-card success">
+        <h3>Accepted</h3>
+        <p id="Accepted">15</p>
+      </div>
+    </section>
+
+  </main>
+  
+ 
+  
+
+  <script src="../../js/adminDashboard.js"></script>
+   <script src="../../js/logout.js"></script>
+  
+</body>
+ 
+</html>
+

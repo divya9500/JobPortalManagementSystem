@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Job Application</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f7fa, #e4ecf7);
+    padding: 30px;
+}
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* Headings */
+h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #1a237e;
+}
+
+p {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+/* Form Grid */
+form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 25px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 3px rgba(63,81,181,0.15);
+}
+
+/* Full Width Fields */
+.full {
+    grid-column: span 2;
+}
+
+/* Radio Buttons */
+.radio-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 400;
+}
+
+/* Multi Select */
+select[multiple] {
+    height: 140px;
+}
+
+/* File Upload */
+.file-box {
+    border: 2px dashed #c5cae9;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f7f9ff;
+}
+
+/* Submit */
+.actions {
+    grid-column: span 2;
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    background: linear-gradient(135deg, #d32f2f, #1976d2);
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(25,118,210,0.35);
+}
+
+/* ===================== */
+/* 📱 Responsive Design */
+/* ===================== */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .container {
+        padding: 30px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    form {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .full,
+    .actions {
+        grid-column: span 1;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    h2 {
+        font-size: 22px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+
+    input, select {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .file-box {
+        padding: 15px;
+    }
+    
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Job Application</h2>
+    <p>Fill your details below</p>
+    
+
+    <form id="jobForm" enctype="multipart/form-data">
+    
+    <!-- USER INFO (PROFILE ONLY) -->
+<div id="userInfoBox" class="full" style="display:none;">
+  <label>Email</label>
+  <input type="email" id="email" disabled>
+
+  <label style="margin-top:10px;">Mobile Number</label>
+  <input type="text" id="mobile" disabled>
+</div>
+    
+
+        <!-- Name -->
+        
+        <div>
+            <label>First Name *</label>
+            <input type="text" name="first_name" required>
+        </div>
+
+        <div>
+            <label>Last Name</label>
+            <input type="text" name="last_name">
+        </div>
+
+        <!-- Gender -->
+        <div class="full">
+            <label>Gender *</label>
+            <div class="radio-group">
+                <label><input type="radio" name="gender" value="MALE" required> Male</label>
+                <label><input type="radio" name="gender" value="FEMALE"> Female</label>
+                <label><input type="radio" name="gender" value="OTHER"> Other</label>
+            </div>
+        </div>
+
+        <!-- Education -->
+        <div>
+            <label>Degree *</label>
+            <input type="text" name="degree" required>
+        </div>
+
+        <div>
+            <label>Graduation Year *</label>
+            <input type="number" name="graduation_year" required>
+        </div>
+
+        <!-- Employment -->
+        <div>
+            <label>Current Employer</label>
+            <input type="text" name="current_employer">
+        </div>
+
+        <div>
+            <label>Current CTC</label>
+            <input type="number" step="0.01" name="current_ctc">
+        </div>
+
+        <div>
+            <label>Expected CTC</label>
+            <input type="number" step="0.01" name="expected_ctc">
+        </div>
+
+        <div>
+            <label>Notice Period (Days)</label>
+            <input type="number" name="notice_period_days">
+        </div>
+        
+        <!-- Experience -->
+<div class="full">
+    <label>Work Experience *</label>
+    <div class="radio-group">
+        <label>
+            <input type="radio" name="has_experience" value="YES" required>
+            Experienced
+        </label>
+        <label>
+            <input type="radio" name="has_experience" value="NO">
+            Fresher
+        </label>
+    </div>
+</div>
+
+<div id="experienceBox" class="full" style="display:none;">
+    <label>Total Experience (Years)</label>
+    <input type="number" name="totalExperienceYears"
+           min="0" max="40" step="0.5"
+           placeholder="e.g. 2.5">
+</div>
+        
+
+        <!-- Skills -->
+        <div class="full">
+            <label>Skills *</label>
+            <select name="skills[]" id="skills" multiple required>
+                <option>Java</option>
+                <option>Spring</option>
+                <option>MySQL</option>
+                <option>HTML</option>
+                <option>CSS</option>
+                <option>JavaScript</option>
+            </select>
+        </div>
+
+        <!-- Location -->
+        <div>
+            <label>Current Location *</label>
+            <input type="text" name="current_location" required>
+        </div>
+
+        <div>
+            <label>Preferred Location *</label>
+            <input type="text" name="preferred_location" required>
+        </div>
+
+        <!-- Resume -->
+        <div class="full file-box">
+            <label>Upload Resume *</label>
+            <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+        </div>
+
+        <!-- Submit -->
+        <div class="actions">
+            <button type="submit" id=submitButton>Submit Application</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+document.querySelectorAll(
+  'input[name="has_experience"]'
+).forEach(radio => {
+  radio.addEventListener("change", () => {
+    const box = document.getElementById("experienceBox");
+    if (radio.value === "YES") {
+      box.style.display = "block";
+    } else {
+      box.style.display = "none";
+      box.querySelector("input").value = "";
+    }
+  });
+});
+</script>
+
+
+<!-- JS -->
+<script src="/JobPortalManagementSystem/js/applyForm.js"></script>
+
+</body>
+</html>

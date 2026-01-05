@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobseeker Home | Online Job Portal</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/JobPortalManagementSystem/css/userHomePage.css">
+</head>
+
+<body>
+
+<header>
+    <h2>Online Job Portal</h2>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#statusTable">My Applications</a>
+        <a href="form.html?mode=profile">Profile</a>
+        <a href="#" id="logout">Logout</a>
+    </nav>
+</header>
+
+<section class="search-section">
+    <h1>Find Your Dream Job</h1>
+    <p>Search and apply for jobs easily</p>
+
+    <div class="search-box">
+        <input id="jobRole" placeholder="Job Role">
+        <input id="jobLocation" placeholder="Location">
+        <button onclick="searchJobs()">Search</button>
+    </div>
+</section>
+
+<section class="container">
+    <h2>Available Jobs</h2>
+    <div class="job-list"></div>
+</section>
+
+<section class="container">
+    <h2>My Application Status</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Job Title</th>
+              
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="statusTable">
+            <!-- Will be loaded later -->
+        </tbody>
+    </table>
+</section>
+
+<footer>
+    © 2025 Online Job Application System
+</footer>
+
+<!-- JS (ONLY ONE FILE) -->
+<script src="/JobPortalManagementSystem/js/jobSearch.js"></script>
+<!-- ===== JOB DETAILS MODAL ===== -->
+<div id="jobModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+
+        <h2 id="mTitle"></h2>
+        <p><b>Location:</b> <span id="mLocation"></span></p>
+        <p><b>Experience:</b> <span id="mExperience"></span></p>
+        <p><b>Salary:</b> <span id="mSalary"></span></p>
+
+        <h4>Description</h4>
+        <p id="mDescription"></p>
+    </div>
+</div>
+<script src="/JobPortalManagementSystem/js/config.js"></script>
+<script src="/JobPortalManagementSystem/js/jobSearch.js"></script>
+ <script src="../../js/logout.js"></script>
+<!-- Main Job Search & Apply Logic -->
+
+
+</body>
+</html>

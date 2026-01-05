@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <form id="signinForm">
+
+        <h2>Sign In</h2>
+        <br>
+
+        <div class="input-box">
+            <input type="email" name="email" required>
+            <label>Email</label>
+        </div>
+
+        <div class="input-box">
+            <input type="password" name="password" required>
+            <label>Password</label>
+        </div>
+
+        <button type="submit" class="btn">Login</button>
+	<a href="forgotPassword.html">Forgot Password?</a>
+	
+	
+	
+	
+	
+        <!-- Create account (hidden for admin) -->
+        <p class="signup-link" id="signupBox">
+            Don’t have an account?
+            <a href="userRegister.html">Create Account</a>
+        </p>
+
+        <div id="message"></div>
+
+    </form>
+</div>
+
+
+<!-- Login Submit -->
+<!-- Axios --> <script src="http://localhost:8080/JobPortalManagementSystem/js/axios.min.js"></script> 
+<!-- Login Submit --> 
+<script> const form = document.getElementById('signinForm'); 
+form.addEventListener('submit', async (e) => { e.preventDefault();
+const data = { email: form.email.value, password: form.password.value };
+try { 
+	const res = await axios.post('../login', data);
+	if (res.data.success) {
+		window.location.href = res.data.redirectUrl;
+		} else { 
+			document.getElementById("message").innerText = res.data.message; 
+			} 
+	} catch (err) { 
+		document.getElementById("message").innerText = "Login failed"; }
+	});
+</script>
+
+
+<!-- Hide Create Account for Admin -->
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type");
+
+    if (type === "admin") {
+        const signupBox = document.getElementById("signupBox");
+        if (signupBox) {
+            signupBox.style.display = "none";
+        }
+    }
+</script>
+<!-- <script src="../js/Login.js"></script> -->
+
+</body>
+</html>

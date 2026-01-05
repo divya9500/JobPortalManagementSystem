@@ -1,0 +1,95 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Page background */
+body {
+    height: 100vh;
+  /*  background: linear-gradient(135deg, #4e73df, #1cc88a);*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card */
+.auth-card {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Title */
+.auth-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Input fields */
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Input focus */
+.auth-card input:focus {
+    border-color: #4e73df;
+    outline: none;
+}
+
+/* Button */
+.auth-card button {
+    width: 100%;
+    padding: 12px;
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.auth-card button:hover {
+    background: #2e59d9;
+}
+
+/* Link */
+.auth-card a {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    color: #4e73df;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.auth-card a:hover {
+    text-decoration: underline;
+}
+
+/* Info text */
+.info-text {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 20px;
+    }
+}
