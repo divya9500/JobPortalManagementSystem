@@ -16,6 +16,7 @@ import com.jobportal.exception.ValidationException;
 import com.jobportal.model.LoginRequest;
 import com.jobportal.model.User;
 import com.jobportal.util.MailUtil;
+import com.jobportal.util.PasswordUtil;
 
 public class UserService {
 	public boolean validatePassword(String pwd) throws ValidationException {
@@ -61,25 +62,32 @@ public class UserService {
 		boolean email=validateMail(user.getEmail());
 		boolean mobNum=valiadateMobNum(user.getMobNum());
 		
-		
+		String hashPassword=PasswordUtil.hashPassword(user.getPasswordHash());
+		user.setPasswordHash(hashPassword);
 	   
 	    UserDAO userDAOImpl=new UserDAOImpl();
 	    try {
 	    	return userDAOImpl.registerUser(user);
 			
 		} catch (DataAccessException e) {
-			throw new JobPoratlException("Registration Failed. Please Try Again");
+			throw new JobPoratlException("Registration Failed. Please Try Again"+e.getMessage());
 		} 
 	}
 	public User login(LoginRequest login) throws ValidationException, JobPoratlException {
 		validateMail(login.getemail());
 		validatePassword(login.getPassword());
+		
 		UserDAOImpl userDAO=new UserDAOImpl();
 		try {
-			User user= userDAO.login(login.getemail(),login.getPassword());
+			User user=userDAO.findByEmailForLogin(login.getemail());
 			if(user==null) {
 				throw new ValidationException("Invalid Credentials");
 			}
+		    if (!PasswordUtil.verifyPassword(login.getPassword(), user.getPasswordHash())) {
+		        throw new ValidationException("Invalid email or password");
+		    }
+			
+			user.setPasswordHash(null);
 			return user;
 		}
 		catch (ValidationException | DataAccessException  e) {
@@ -90,7 +98,7 @@ public class UserService {
 	}
 	
 	public void sendPasswordResetLink(String email)
-	        throws ValidationException, SQLException {
+	        throws ValidationException, SQLException, DataAccessException {
 		UserDAOImpl userDAO=new UserDAOImpl();
 		PasswordResetTokenDAO tokenDAO=new PasswordResetTokenDAO();
 	    User user = userDAO.findByEmail(email);
@@ -138,7 +146,7 @@ public class UserService {
 	        long tokenId = rs.getLong("id");
 	        long userId = rs.getLong("user_id");
 
-	       // String hashed = PasswordUtil.hash(newPassword);
+	        String hashed = PasswordUtil.hashPassword(newPassword);
 
 	        userDAO.updatePassword(userId, newPassword);
 	        tokenDAO.markUsed(tokenId);

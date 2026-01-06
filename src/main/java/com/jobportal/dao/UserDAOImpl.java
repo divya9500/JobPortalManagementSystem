@@ -12,19 +12,20 @@ import com.jobportal.exception.DataAccessException;
 import com.jobportal.model.User;
 import com.jobportal.model.User.Role;
 import com.jobportal.util.DBUtil;
+import com.jobportal.util.PasswordUtil;
 
 public class UserDAOImpl implements UserDAO {
-
+ 
     @Override
     public boolean registerUser(User user) throws DataAccessException {
 
         String sql = "INSERT INTO users "
                    + "(full_name, email, mob_num, password_hash, role, status) "
                    + "VALUES (?, ?, ?, ?, ?, ?)";
-
+      
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
+        	
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getMobNum());
@@ -35,6 +36,7 @@ public class UserDAOImpl implements UserDAO {
            
 
             ps.executeUpdate();
+         
             return true;
 
         } catch (java.sql.SQLIntegrityConstraintViolationException e) {
@@ -54,8 +56,7 @@ public class UserDAOImpl implements UserDAO {
 
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
-           
+        	
             ps.setString(1,email);
            
             ps.setString(2, password);
@@ -97,7 +98,7 @@ public class UserDAOImpl implements UserDAO {
     }
     
     
-    public User findByEmail(String email) {
+    public User findByEmail(String email) throws DataAccessException {
         String sql = "SELECT id, email FROM users WHERE email=?";
 
         try (Connection con = DBUtil.getConnection();
@@ -113,10 +114,40 @@ public class UserDAOImpl implements UserDAO {
                 return user;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataAccessException("User login fetch failed", e);
         }
         return null;
     }
+    
+    
+    public User findByEmailForLogin(String email) throws DataAccessException {
+
+        String sql = "SELECT id, full_name, email, mob_num, password_hash, role " +
+                     "FROM users WHERE email=?";
+
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setMobNum(rs.getString("mob_num"));
+                user.setPasswordHash(rs.getString("password_hash")); // INTERNAL ONLY
+                user.setRole(Role.valueOf(rs.getString("role")));
+                return user;
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("User login fetch failed", e);
+        }
+        return null;
+    }
+
 
   
 

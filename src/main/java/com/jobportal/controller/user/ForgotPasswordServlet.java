@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.jobportal.exception.DataAccessException;
 import com.jobportal.exception.ValidationException;
 import com.jobportal.model.ApiResponse;
 import com.jobportal.service.user.UserService;
@@ -39,6 +40,10 @@ public class ForgotPasswordServlet extends HttpServlet {
         } catch (SQLException e) {
 			
             res.getWriter().write( gson.toJson(new ApiResponse(false, e.getMessage())));
+		} catch (DataAccessException e) {
+			
+            res.getWriter().write( gson.toJson(new ApiResponse(false, e.getMessage())));
+
 		}
     }
 }
