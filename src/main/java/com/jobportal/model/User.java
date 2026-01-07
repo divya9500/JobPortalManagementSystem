@@ -1,5 +1,6 @@
 package com.jobportal.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class User {
@@ -10,9 +11,28 @@ public class User {
 	    private String passwordHash;
 	    private Role role;
 	    private Status status;
+	    private int failedAttempts;
+	   private Timestamp accountLockedUntil;      
+
 	    
 	   
-	    // Enum for Role
+	    public int getFailedAttempts() {
+		return failedAttempts;
+	}
+
+	public void setFailedAttempts(int failedAttempts) {
+		this.failedAttempts = failedAttempts;
+	}
+
+	public Timestamp getAccountLockedUntil() {
+		return accountLockedUntil;
+	}
+
+	public void setAccountLockedUntil(Timestamp accountLockedUntil) {
+		this.accountLockedUntil = accountLockedUntil;
+	}
+
+		// Enum for Role
 	    public enum Role {
 	        USER,
 	        HR,

@@ -8,7 +8,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
+<body  data-role="">
 
 <div class="container">
     <form id="signinForm">
@@ -46,8 +46,8 @@
 
 
 <!-- Login Submit -->
-<!-- Axios --> <script src="http://localhost:8080/JobPortalManagementSystem/js/axios.min.js"></script> 
-<!-- Login Submit --> 
+<!-- Axios  <script src="http://localhost:8080/JobPortalManagementSystem/js/axios.min.js"></script> 
+
 <script> const form = document.getElementById('signinForm'); 
 form.addEventListener('submit', async (e) => { e.preventDefault();
 const data = { email: form.email.value, password: form.password.value };
@@ -59,10 +59,10 @@ try {
 			document.getElementById("message").innerText = res.data.message; 
 			} 
 	} catch (err) { 
-		document.getElementById("message").innerText = "Login failed"; }
+		document.getElementById("message").innerText = res.data.message; }
 	});
 </script>
-
+-->
 
 <!-- Hide Create Account for Admin -->
 <script>
@@ -76,7 +76,7 @@ try {
         }
     }
 </script>
-<!-- <script src="../js/Login.js"></script> -->
+ <script type="module" src="../js/Login.js"></script> 
 
 </body>
 </html>

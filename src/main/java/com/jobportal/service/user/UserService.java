@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 import com.jobportal.dao.PasswordResetTokenDAO;
@@ -15,6 +16,7 @@ import com.jobportal.exception.JobPoratlException;
 import com.jobportal.exception.ValidationException;
 import com.jobportal.model.LoginRequest;
 import com.jobportal.model.User;
+import com.jobportal.model.User.Role;
 import com.jobportal.util.MailUtil;
 import com.jobportal.util.PasswordUtil;
 
@@ -83,14 +85,51 @@ public class UserService {
 			if(user==null) {
 				throw new ValidationException("Invalid Credentials");
 			}
+			//Check lock
+			  Timestamp lockedUntil = user.getAccountLockedUntil();
+			    if (lockedUntil != null && lockedUntil.after(new Date())) {
+			        throw new ValidationException(
+			            "Account locked. Try again after 15 minutes"
+			        );
+			    }
 		    if (!PasswordUtil.verifyPassword(login.getPassword(), user.getPasswordHash())) {
-		        throw new ValidationException("Invalid email or password");
-		    }
-			
+		    	  int attempts = user.getFailedAttempts() + 1;
+		          Timestamp lockTime = null;
+
+		          if (attempts >= 5) {
+		              lockTime = new Timestamp(System.currentTimeMillis() + (15 * 60 * 1000) );
+		              }
+		          
+		          userDAO.updateFailedAttempts(user.getId(), attempts, lockTime);
 			user.setPasswordHash(null);
+			throw new ValidationException("Invalid email or password");
+			}
+		    
+		    
+		    Role loginRole = Role.valueOf(login.getRole()+"".toUpperCase());
+
+		 // Admin login page
+		 if (loginRole == Role.ADMIN) {
+		     if (!(user.getRole() == Role.ADMIN
+		         || user.getRole() == Role.SUPER_ADMIN
+		         || user.getRole() == Role.HR)) {
+
+		    	   throw new ValidationException("Unauthorized login attempt");
+		       
+		     }
+		 }
+
+		 // User login page
+		 if (loginRole == Role.USER && user.getRole() != Role.USER) {
+			   throw new ValidationException("Unauthorized login attempt");
+		 }
+
+		    userDAO.resetLoginAttempts(user.getId());
+			
 			return user;
+		    
 		}
-		catch (ValidationException | DataAccessException  e) {
+		catch (ValidationException | DataAccessException | SQLException  e) {
 			throw new JobPoratlException(e.getMessage());
 
 		}
@@ -148,12 +187,17 @@ public class UserService {
 
 	        String hashed = PasswordUtil.hashPassword(newPassword);
 
-	        userDAO.updatePassword(userId, newPassword);
+	        userDAO.updatePassword(userId, hashed);
 	        tokenDAO.markUsed(tokenId);
 
 	    } catch (SQLException e) {
 	        throw new ValidationException("Unable to reset password");
 	    }
+	}
+	private boolean isAdminRole(Role role) {
+	    return role == Role.ADMIN
+	        || role == Role.SUPER_ADMIN
+	        || role == Role.HR;
 	}
 
 

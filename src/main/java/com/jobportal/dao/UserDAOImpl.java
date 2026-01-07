@@ -122,7 +122,7 @@ public class UserDAOImpl implements UserDAO {
     
     public User findByEmailForLogin(String email) throws DataAccessException {
 
-        String sql = "SELECT id, full_name, email, mob_num, password_hash, role " +
+        String sql = "SELECT id, full_name, email, mob_num, password_hash, role,failed_attempts, account_locked_until " +
                      "FROM users WHERE email=?";
 
         try (Connection con = DBUtil.getConnection();
@@ -139,6 +139,8 @@ public class UserDAOImpl implements UserDAO {
                 user.setMobNum(rs.getString("mob_num"));
                 user.setPasswordHash(rs.getString("password_hash")); // INTERNAL ONLY
                 user.setRole(Role.valueOf(rs.getString("role")));
+                user.setFailedAttempts(rs.getInt("failed_attempts"));
+                user.setAccountLockedUntil(rs.getTimestamp("account_locked_until"));
                 return user;
             }
 
@@ -147,6 +149,29 @@ public class UserDAOImpl implements UserDAO {
         }
         return null;
     }
+    
+    public void updateFailedAttempts(long userId, int attempts, Timestamp lockUntil)
+            throws SQLException {
+
+        String sql = "UPDATE users SET failed_attempts=?, account_locked_until=? WHERE id=?";
+
+        try (PreparedStatement ps = DBUtil.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, attempts);
+            ps.setTimestamp(2, lockUntil);
+            ps.setLong(3, userId);
+            ps.executeUpdate();
+        }
+    }
+    public void resetLoginAttempts(long userId) throws SQLException {
+
+        String sql = "UPDATE users SET failed_attempts=0, account_locked_until=NULL WHERE id=?";
+
+        try (PreparedStatement ps = DBUtil.getConnection().prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.executeUpdate();
+        }
+    }
+
 
 
   
