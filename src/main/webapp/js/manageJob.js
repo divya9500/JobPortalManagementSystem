@@ -1,55 +1,62 @@
-document.addEventListener("DOMContentLoaded", loadJobs);
+import { csrfFetch } from "./csrf.js";
 
-function loadJobs() {
+document.addEventListener("DOMContentLoaded", () => {
+  const tableBody = document.getElementById("jobTableBody");
+  if (!tableBody) return; // not this page
+
+  loadJobs();
+
+  function loadJobs() {
     fetch("/JobPortalManagementSystem/page/admin/jobs")
-        .then(response => response.json())
-        .then(data => displayJobs(data))
-        .catch(error => console.error("Error fetching jobs:", error));
-}
+      .then(res => res.json())
+      .then(displayJobs)
+      .catch(err => console.error("Error fetching jobs:", err));
+  }
 
-function displayJobs(jobs) {
-    const tableBody = document.getElementById("jobTableBody");
+  function displayJobs(jobs) {
     tableBody.innerHTML = "";
 
     jobs.forEach(job => {
-        const row = document.createElement("tr");
+      const row = document.createElement("tr");
 
-        row.innerHTML = `
-            <td>${job.jobId}</td>
-            <td>${job.title}</td>
-            <td>${job.location}</td>
-            <td>
-                <button class="action-btn edit" onclick="editJob(${job.jobId})">
-                    Edit
-                </button>
-                <button class="action-btn delete" onclick="deleteJob(${job.jobId})">
-                    Delete
-                </button>
-            </td>
-        `;
+      // columns
+      row.innerHTML = `
+        <td>${job.jobId}</td>
+        <td>${job.title}</td>
+        <td>${job.location}</td>
+        <td></td>
+      `;
 
-        tableBody.appendChild(row);
+      // action buttons
+      const actionCell = row.children[3];
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "action-btn edit";
+      editBtn.textContent = "Edit";
+      editBtn.addEventListener("click", () => editJob(job.jobId));
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "action-btn delete";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.addEventListener("click", () => deleteJob(job.jobId));
+
+      actionCell.append(editBtn, deleteBtn);
+      tableBody.appendChild(row);
     });
-}
+  }
 
-/*CORRECT EDIT FUNCTION */
-function editJob(jobId) {
-    // redirect to postJob.html with jobId
+  function editJob(jobId) {
     window.location.href =
-        "/JobPortalManagementSystem/page/admin/jobPost.html?jobId=" + jobId;
-}
+      `/JobPortalManagementSystem/page/admin/jobPost.html?jobId=${jobId}`;
+  }
 
-/*DELETE FUNCTION */
-function deleteJob(jobId) {
-    if (confirm("Are you sure you want to delete this job?")) {
-        fetch(`/JobPortalManagementSystem/delete/job?jobId=${jobId}`, {
-            method: "DELETE"
-        })
-        .then(response => response.text())
-        .then(result => {
-            alert(result);
-            loadJobs();
-        })
-        .catch(error => console.error(error));
-    }
-}
+  function deleteJob(jobId) {
+    if (!confirm("Are you sure you want to delete this job?")) return;
+
+    csrfFetch(`/JobPortalManagementSystem/delete/job?jobId=${jobId}`, {
+      method: "DELETE"
+    })
+      .then(() => loadJobs())
+      .catch(console.error);
+  }
+});

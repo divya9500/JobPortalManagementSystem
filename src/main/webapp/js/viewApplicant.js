@@ -1,3 +1,8 @@
+import { csrfFetch, loadCsrfToken } from "./csrf.js";
+
+/* =========================
+   READ JOB ID
+========================= */
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get("jobId");
 
@@ -8,81 +13,126 @@ if (!jobId) {
 
 const BASE = "/JobPortalManagementSystem/page/admin";
 
-document.addEventListener("DOMContentLoaded", () => {
+/* =========================
+   INIT
+========================= */
+document.addEventListener("DOMContentLoaded", async () => {
+
+  // 🔐 Ensure CSRF token exists (important on refresh)
+  if (!sessionStorage.getItem("CSRF_TOKEN")) {
+    await loadCsrfToken();
+  }
+
   loadJobDetails();
   loadApplicants();
+
+  // Bulk update button binding
+  const bulkBtn = document.getElementById("bulkUpdateBtn");
+  if (bulkBtn) {
+    bulkBtn.addEventListener("click", () => bulkUpdateStatus(bulkBtn));
+  }
 });
 
-// ---------------- Job Info ----------------
+/* =========================
+   JOB INFO
+========================= */
 function loadJobDetails() {
   fetch(`${BASE}/job/details?jobId=${jobId}`)
     .then(res => res.json())
     .then(job => {
-      document.getElementById("jobInfo").innerText =
-        `Job ID: ${job.jobId} | ${job.title} | ${job.location}`;
+      const info = document.getElementById("jobInfo");
+      if (info) {
+        info.innerText =
+          `Job ID: ${job.jobId} | ${job.title} | ${job.location}`;
+      }
     });
 }
 
-// ---------------- Applicants ----------------
+/* =========================
+   LOAD APPLICANTS
+========================= */
 function loadApplicants() {
   fetch(`${BASE}/job/applications?jobId=${jobId}`)
     .then(res => res.json())
-    .then(renderTable);
+    .then(renderTable)
+    .catch(console.error);
 }
 
+/* =========================
+   RENDER TABLE
+========================= */
 function renderTable(apps) {
   const body = document.getElementById("appBody");
+  if (!body) return;
 
-  let html = "";
+  body.innerHTML = "";
 
   apps.forEach(app => {
-    html += `
-      <tr data-app-id="${app.applicationId}">
-        <td>${app.name}</td>
-        <td>${app.email}</td>
-        <td>${app.appliedAt}</td>
-        <td>
-          <span class="status-badge ${app.applicationStatus}">
-            ${formatStatus(app.applicationStatus)}
-          </span>
-        </td>
-        <td>
-          <select id="sel-${app.applicationId}">
-            <option>APPLIED</option>
-            <option>SHORTLISTED</option>
-            <option>INTERVIEW_SCHEDULED</option>
-            <option>INTERVIEW_PASSED</option>
-            <option>INTERVIEW_FAILED</option>
-            <option>OFFERED</option>
-            <option>REJECTED</option>
-          </select>
-          <button onclick="updateStatus(this, ${app.applicationId})">Update</button>
-          <button onclick="viewHistory(${app.applicationId})">History</button>
-        </td>
-      </tr>
+    const row = document.createElement("tr");
+    row.dataset.appId = app.applicationId;
+
+    row.innerHTML = `
+      <td>${app.name}</td>
+      <td>${app.email}</td>
+      <td>${app.appliedAt}</td>
+      <td>
+        <span class="status-badge ${app.applicationStatus}">
+          ${formatStatus(app.applicationStatus)}
+        </span>
+      </td>
+      <td>
+        <select class="status-select">
+          <option>APPLIED</option>
+          <option>SHORTLISTED</option>
+          <option>INTERVIEW_SCHEDULED</option>
+          <option>INTERVIEW_PASSED</option>
+          <option>INTERVIEW_FAILED</option>
+          <option>OFFERED</option>
+          <option>REJECTED</option>
+        </select>
+        <button class="update-btn">Update</button>
+        <button class="history-btn">History</button>
+      </td>
     `;
+
+    body.appendChild(row);
+    row.querySelector(".status-select").value = app.applicationStatus;
   });
 
-  // ONE DOM PAINT ONLY
-  body.innerHTML = html;
+  bindRowActions();
+}
 
-  // Set select values AFTER render
-  apps.forEach(app => {
-    const sel = document.getElementById(`sel-${app.applicationId}`);
-    if (sel) sel.value = app.applicationStatus;
+/* =========================
+   BIND ROW ACTIONS
+========================= */
+function bindRowActions() {
+
+  document.querySelectorAll(".update-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const row = btn.closest("tr");
+      updateStatus(btn, row.dataset.appId);
+    });
+  });
+
+  document.querySelectorAll(".history-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const row = btn.closest("tr");
+      viewHistory(row.dataset.appId);
+    });
   });
 }
 
-
-// ---------------- Single Update ----------------
+/* =========================
+   SINGLE STATUS UPDATE
+========================= */
 function updateStatus(btn, appId) {
   btn.disabled = true;
 
-  const status = document.getElementById(`sel-${appId}`).value;
   const row = btn.closest("tr");
+  const status = row.querySelector(".status-select").value;
   const badge = row.querySelector(".status-badge");
 
-  fetch(`${BASE}/update/status`, {
+  csrfFetch(`${BASE}/update/status`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -90,143 +140,108 @@ function updateStatus(btn, appId) {
       applicationStatus: status
     })
   })
-  .then(res => res.json())
-  .then(resp => {
-    if (resp.success) {
-      //  Optimistic UI update (instant)
-      badge.className = `status-badge ${status}`;
-      badge.innerText = formatStatus(status);
-    } else {
-      alert(resp.message || "Update failed");
-    }
-  })
-  .catch(() => alert("Server error"))
-  .finally(() => btn.disabled = false);
+    .then(async res => {
+      const text = await res.text();
+      return text ? JSON.parse(text) : {};
+    })
+    .then(resp => {
+      if (resp.success) {
+        badge.className = `status-badge ${status}`;
+        badge.innerText = formatStatus(status);
+      } else {
+        alert(resp.message || "Update failed");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Server error");
+    })
+    .finally(() => btn.disabled = false);
 }
 
-// ---------------- Bulk Update ----------------
+/* =========================
+   BULK UPDATE
+========================= */
 function bulkUpdateStatus(btn) {
 
-  // ------------------------------
-  // Button feedback
-  // ------------------------------
-  const originalText = btn.innerText;
-  btn.disabled = true;
-  btn.innerText = "Processing...";
+  const fromStatus = document.getElementById("fromStatus")?.value;
+  const toStatus   = document.getElementById("toStatus")?.value;
+  const limit      = Number(document.getElementById("limit")?.value);
 
-  // ------------------------------
-  // Get DOM elements
-  // ------------------------------
-  const fromStatusEl = document.getElementById("fromStatus");
-  const toStatusEl   = document.getElementById("toStatus");
-  const limitEl      = document.getElementById("limit");
-  const minExpEl     = document.getElementById("minExp");
-  const gradYearEl   = document.getElementById("gradYear");
-  const appliedAfterEl = document.getElementById("appliedAfter");
-
-  if (!fromStatusEl || !toStatusEl || !limitEl) {
-    alert("Required fields missing");
-    reset();
-    return;
-  }
-
-  const fromStatus = fromStatusEl.value;
-  const toStatus   = toStatusEl.value;
-  const limitVal   = Number(limitEl.value);
-
-  if (!fromStatus || !toStatus || !limitVal) {
-    alert("Please select From Status, To Status and Limit");
-    reset();
+  if (!fromStatus || !toStatus || !limit) {
+    alert("Please fill From Status, To Status and Limit");
     return;
   }
 
   if (fromStatus === toStatus) {
-    alert("From Status and To Status cannot be the same");
-    reset();
+    alert("From and To status cannot be same");
     return;
   }
 
-  // ------------------------------
-  // Payload (matches backend)
-  // ------------------------------
-  const payload = {
-    jobId: jobId,
-    fromStatus: fromStatus,
-    applicationStatus: toStatus,
-    minExperience: minExpEl && minExpEl.value ? Number(minExpEl.value) : null,
-    minGraduationYear: gradYearEl && gradYearEl.value ? Number(gradYearEl.value) : null,
-    appliedAfter: appliedAfterEl && appliedAfterEl.value ? appliedAfterEl.value : null,
-    limit: limitVal
-  };
-
-  if (!confirm(`Move top ${limitVal} candidates from ${fromStatus} → ${toStatus}?`)) {
-    reset();
+  if (!confirm(`Move top ${limit} candidates from ${fromStatus} → ${toStatus}?`)) {
     return;
   }
 
-  // ------------------------------
-  // API call
-  // ------------------------------
-  fetch(`${BASE}/update/status/filter`, {
+  btn.disabled = true;
+  const oldText = btn.innerText;
+  btn.innerText = "Processing...";
+
+  csrfFetch(`${BASE}/update/status/filter`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      jobId: jobId,
+      fromStatus: fromStatus,
+      applicationStatus: toStatus,
+      limit: limit
+    })
   })
     .then(res => res.json())
     .then(resp => {
-	console.log(resp);
       if (!resp.success) {
         alert(resp.message || "Bulk update failed");
         return;
       }
-		
-      // ------------------------------
-      //  UPDATE UI USING BACKEND IDs
-      // ------------------------------
+
       resp.updatedIds.forEach(id => {
         const row = document.querySelector(`tr[data-app-id="${id}"]`);
         if (!row) return;
 
         const badge = row.querySelector(".status-badge");
-        if (!badge) return;
-
         badge.className = `status-badge ${toStatus}`;
         badge.innerText = formatStatus(toStatus);
       });
 
-      alert(`Successfully updated ${resp.updatedCount} candidates`);
+      alert(`Updated ${resp.updatedCount} applications`);
     })
-    .catch(() => {
-      alert("Server error during bulk update");
-    })
-    .finally(() => reset());
-
-  // ------------------------------
-  // Helper
-  // ------------------------------
-  function reset() {
-    btn.disabled = false;
-    btn.innerText = originalText;
-  }
+    .catch(() => alert("Server error"))
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerText = oldText;
+    });
 }
 
-
-
-// ---------------- History ----------------
-function viewHistory(id) {
-  fetch(`${BASE}/application/history?applicationId=${id}`)
+/* =========================
+   HISTORY
+========================= */
+function viewHistory(appId) {
+  fetch(`${BASE}/application/history?applicationId=${appId}`)
     .then(res => res.json())
     .then(data => {
       const body = document.getElementById("historyTableBody");
+      if (!body) return;
+
       body.innerHTML = "";
 
       data.forEach(h => {
-        body.innerHTML += ` <tr>
-    	   <td>${formatStatus(h.oldStatus)}</td>
+        body.innerHTML += `
+          <tr>
+            <td>${formatStatus(h.oldStatus)}</td>
             <td>${formatStatus(h.newStatus)}</td>
             <td>${h.changedBy}</td>
             <td>${new Date(h.changedAt).toLocaleString()}</td>
-          </tr>`;
+          </tr>
+        `;
       });
 
       openHistoryModal();
@@ -241,7 +256,9 @@ function closeHistoryModal() {
   document.getElementById("historyModal").style.display = "none";
 }
 
+/* =========================
+   UTIL
+========================= */
 function formatStatus(s) {
   return s.replaceAll("_", " ");
 }
-

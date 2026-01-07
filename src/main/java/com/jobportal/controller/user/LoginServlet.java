@@ -47,7 +47,7 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = req.getSession(true);
             session.setAttribute("user", user);
-           // session.setAttribute("CSRF_TOKEN", java.util.UUID.randomUUID().toString());
+            session.setAttribute("CSRF_TOKEN", java.util.UUID.randomUUID().toString());
 
 
             String contextPath = req.getContextPath();

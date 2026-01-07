@@ -1,3 +1,6 @@
+import { csrfFetch } from './csrf.js';
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =========================
@@ -98,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mode === "profile") {
       const fd = new FormData(form);
 
-      fetch("/JobPortalManagementSystem/user/profile/update", {
+      csrfFetch("/JobPortalManagementSystem/user/profile/update", {
         method: "POST",
         body: fd
       })
@@ -143,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const sendRequest = (resumeBase64) => {
-      fetch("/JobPortalManagementSystem/apply/job", {
+      csrfFetch("/JobPortalManagementSystem/apply/job", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

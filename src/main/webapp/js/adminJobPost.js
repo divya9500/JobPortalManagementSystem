@@ -1,3 +1,4 @@
+import { csrfFetch } from "./csrf.js";
 document.getElementById("jobPostForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -29,7 +30,7 @@ document.getElementById("jobPostForm").addEventListener("submit", function (e) {
     }
         console.log("Job Data JSON:", JSON.stringify(jobData));
 
-    fetch(url, {
+    csrfFetch(url, {
         method: method,
         headers: {
             "Content-Type": "application/json"

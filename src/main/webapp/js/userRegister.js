@@ -17,8 +17,8 @@ document.getElementById("signupForm").addEventListener("submit", function(e){
 
         this.reset();
         
-        if(data.status){
-		window.location.href="../page/signinPage.html";
+        if(data.success){
+		window.location.href="signinPage.html";
 		}
     })
     .catch(err => {

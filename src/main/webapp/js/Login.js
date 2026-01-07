@@ -1,3 +1,6 @@
+import { loadCsrfToken } from './csrf.js';
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("signinForm").addEventListener("submit", function (e) {
@@ -16,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(formData)
         })
         .then(res => res.json())
-        .then(data => {
+        .then(async  data => {
 
             const messageDiv = document.getElementById("message");
 
@@ -24,10 +27,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 messageDiv.innerHTML =
                     `<span style="color:green">${data.message}</span>`;
 
-                // redirect after short delay
-                setTimeout(() => {
+             
+                await loadCsrfToken();
+               
                     window.location.href = data.redirectUrl;
-                }, 1000);
+               
 
             } else {
                 messageDiv.innerHTML =
